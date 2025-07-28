@@ -1,0 +1,28 @@
+{
+  "name": "fsopart3",
+  "version": "1.0.0",
+  "description": "Backend for the phonebook app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joanrates/FSOPart3.git"
+  },
+  "author": "Joan Ratés",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joanrates/FSOPart3/issues"
+  },
+  "homepage": "https://github.com/joanrates/FSOPart3#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
