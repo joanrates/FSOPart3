@@ -44,6 +44,27 @@ app.get('/api/persons', (request, response) => {
   response.json(persons)
 })
 
+app.put('/api/persons/:id',(request,response) =>{
+    const id = Number(request.params.id)
+    const body = request.body
+    const person = persons.find(person => person.id === id)
+
+    if (!person) {
+        return response.status(404).json({
+            error: 'Person not found'
+        })
+    }
+
+    const updatedPerson = {
+        ...person,
+        name: body.name,
+        number: body.number
+    }
+
+    persons = persons.map(p => p.id !== id ? p : updatedPerson)
+    response.json(updatedPerson)
+})
+
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id )
