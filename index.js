@@ -31,26 +31,9 @@ app.get('/api/persons', (request, response) => {
 app.put('/api/persons/:id',(request,response) =>{
     const id = (request.params.id)
     const body = request.body
-    /* Person.findById(id)
-        .then(person => {
-            if (!person) {
-                return response.status(404).json({
-                    error: 'Person not found'
-                })
-            }
-
-            const updatedPerson = Person({
-                ...person,
-                name: body.name,
-                number: body.number
-            })
-            
-            persons = persons.map(p => p.id !== id ? p : updatedPerson)
-            response.json(updatedPerson)
-        }) */
+   
     Person.findByIdAndUpdate(id,{number:body.number, name:body.name})
         .then(result => {
-            console.log("updated", result.toJSON())
             response.json(result)
         })
 })
@@ -120,7 +103,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 const PORT = process.env.PORT || 3001
-console.log(`port ${process.env.PORT}`)
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
