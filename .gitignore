@@ -1,2 +1,4 @@
 node_modules
 .env
+apikeys.env
+node_modules/.package-lock.json
