@@ -85,21 +85,26 @@ app.post('/api/persons', (request, response) => {
             ...body,
             error: "name or number missing"
         })
-    } else if (persons.find(person => person.name === body.name)) {
-        response.status(409).json({
-            error: "This name is already set in the server"
-        })
-    } else {
-        const person = new Person({
-            name: body.name,
-            number: body.number
-        })
+    } 
+    Person.exists({name:body.name})
+        .then(person => {
+            if(person){
+                response.status(409).json({
+                    error: "This name is already set in the server"
+                })
+            } else {
+                const newPerson = new Person({
+                    name: body.name,
+                    number: body.number
+                })
 
-        person.save().then(savedPerson => {
-            response.json(savedPerson)
+                newPerson.save().then(savedPerson => {
+                    response.json(savedPerson)
+                })
+                
+            }
         })
-        
-    }
+     
 })
 
 const PORT = process.env.PORT || 3001
