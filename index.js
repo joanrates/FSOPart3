@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -13,6 +14,7 @@ morgan.token('person', (req, res) => {
         })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 app.use(express.static('dist'))
+
 let persons = [
     { 
       "id": 1,
@@ -41,7 +43,9 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.put('/api/persons/:id',(request,response) =>{
