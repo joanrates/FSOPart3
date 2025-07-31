@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 const app = express()
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(cors())
 morgan.token('person', (req, res) => {
@@ -14,7 +15,7 @@ morgan.token('person', (req, res) => {
             })
         })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
-app.use(express.static('dist'))
+
 
 
 
@@ -28,17 +29,21 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.put('/api/persons/:id',(request,response) =>{
+app.put('/api/persons/:id',(request,response, next) =>{
     const id = (request.params.id)
-    const body = request.body
+    const {name,number} = request.body
    
-    Person.findByIdAndUpdate(id,{number:body.number, name:body.name})
+    Person.findByIdAndUpdate(id,{number:number, name:name},{new:true,runValidators: true, context: 'query'})
         .then(result => {
-            response.json(result)
+            if (result)
+                response.json(result)
+            else
+                response.status(404).json({error: "this person does not exist in the phonebook"})
         })
+        .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     const person = Person.find({_id: id})
         .then(result=>{
@@ -51,18 +56,18 @@ app.get('/api/persons/:id', (request, response) => {
             }
         })
         .catch(error => {
-            response.statusMessage=error.message
-            response.status(500).end()
+            next(error)
         })
 
 })
 
-app.delete('/api/persons/:id', (request, response) =>{
+app.delete('/api/persons/:id', (request, response, next) =>{
     const id = request.params.id;
-    Person.deleteOne({_id: id})
+    Person.findByIdAndDelete(id)
         .then(result => {
             response.status(204).end()
         })
+        .catch(error => next(error))
 
 })
 
@@ -77,15 +82,15 @@ app.get('/info', (request, response) => {
   
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response,next) => {
     const body = request.body;
 
-    if (!body.name || !body.number){
-        response.status(400).json({
+    /* if (!body.name || !body.number){
+        return response.status(400).json({
             ...body,
             error: "name or number missing"
         })
-    } 
+    }  */
     Person.exists({name:body.name})
         .then(person => {
             if(person){
@@ -98,14 +103,43 @@ app.post('/api/persons', (request, response) => {
                     number: body.number
                 })
 
-                newPerson.save().then(savedPerson => {
+                newPerson.save()
+                .then(savedPerson => {
                     response.json(savedPerson)
                 })
+                .catch(error => next(error))
                 
             }
         })
+        .catch(error => next(error))
      
 })
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// controlador de solicitudes con endpoint desconocido
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  
+  switch (error.name) {
+    case 'CastError':
+        return response.status(400).send({ error: 'malformatted id' })
+    case 'ValidationError':
+        return response.status(400).json({ error: error.message })
+        break;
+    default:
+        console.error(error.message)
+        next(error)
+        break;
+  }
+  
+}
+
+app.use(errorHandler)
+
 
 const PORT = process.env.PORT || 3001
 
