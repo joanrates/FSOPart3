@@ -30,10 +30,10 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.put('/api/persons/:id',(request,response, next) =>{
-    const id = (request.params.id)
+    const id = request.params.id
     const {name,number} = request.body
    
-    Person.findByIdAndUpdate(id,{number:number, name:name},{new:true,runValidators: true, context: 'query'})
+    Person.findOneAndUpdate({name:name},{number:number, name:name},{new:true,runValidators: true, context: 'query'})
         .then(result => {
             if (result)
                 response.json(result)
@@ -126,9 +126,9 @@ const errorHandler = (error, request, response, next) => {
   
   switch (error.name) {
     case 'CastError':
-        return response.status(400).send({ error: 'malformatted id' })
+        return response.status(400).send({ error: 'malformatted id', type: 'CastError' })
     case 'ValidationError':
-        return response.status(400).json({ error: error.message })
+        return response.status(400).json({ error: error.message , type: 'ValidationError'})
         break;
     default:
         console.error(error.message)

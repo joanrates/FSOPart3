@@ -4,7 +4,7 @@
   "description": "Backend for the phonebook app",
   "main": "index.js",
   "scripts": {
-    "build:ui": "rm -rf dist && cd ../part2/phonebook && npm run build && cp -r dist ../../FSOPart3 && cd ../../FSOPart3",
+    "build:ui": "rm -rf dist && cd ../FullStackOpenExercices/part2/phonebook && npm run build && cp -r dist ../../../FSOPart3/ && cd ../../../FSOPart3",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",

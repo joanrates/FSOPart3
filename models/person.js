@@ -19,7 +19,14 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    required:true
+    minLength:8,
+    validate:{
+      validator:(v)=>{
+        return /^\d{2,3}-\d*$/.test(v)
+      },
+      message:"This format does not match a phone number. At least 8 digits started by dd-... or ddd-..."
+    },
+    required: [true, "user phone is required"]
   },
 })
 personSchema.set('toJSON', {
