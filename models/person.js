@@ -3,12 +3,12 @@ const mongoose = require('mongoose')
 const password = process.argv[2]
 const url = process.env.MONGO_URI
 mongoose.set('strictQuery',false)
-console.log("connecting to url", url)
+console.log('connecting to url', url)
 mongoose.connect(url)
   .then(result => {
-    console.log("connected to MongoDB")
+    console.log('connected to MongoDB')
   })
-  .catch(error =>{
+  .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
   })
 const personSchema = new mongoose.Schema({
@@ -21,12 +21,12 @@ const personSchema = new mongoose.Schema({
     type: String,
     minLength:8,
     validate:{
-      validator:(v)=>{
+      validator:(v) => {
         return /^\d{2,3}-\d*$/.test(v)
       },
-      message:"This format does not match a phone number. At least 8 digits started by dd-... or ddd-..."
+      message:'This format does not match a phone number. At least 8 digits started by dd-... or ddd-...'
     },
-    required: [true, "user phone is required"]
+    required: [true, 'user phone is required']
   },
 })
 personSchema.set('toJSON', {

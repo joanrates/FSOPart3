@@ -1,5 +1,5 @@
 {
-  "name": "fsopart3",
+  "name" : "fsopart3",
   "version": "1.0.0",
   "description": "Backend for the phonebook app",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "lint": "eslint . "
   },
   "repository": {
     "type": "git",

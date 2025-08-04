@@ -8,12 +8,12 @@ app.use(express.static('dist'))
 app.use(express.json())
 app.use(cors())
 morgan.token('person', (req, res) => {
-            if (req.method !== 'POST') return ''
-            return JSON.stringify({
-                name: req.body.name,
-                number: req.body.number
-            })
-        })
+  if (req.method !== 'POST') return ''
+  return JSON.stringify({
+    name: req.body.name,
+    number: req.body.number
+  })
+})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 
 
@@ -29,90 +29,90 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.put('/api/persons/:id',(request,response, next) =>{
-    const id = request.params.id
-    const {name,number} = request.body
-   
-    Person.findOneAndUpdate({name:name},{number:number, name:name},{new:true,runValidators: true, context: 'query'})
-        .then(result => {
-            if (result)
-                response.json(result)
-            else
-                response.status(404).json({error: "this person does not exist in the phonebook"})
-        })
-        .catch(error => next(error))
+app.put('/api/persons/:id',(request,response, next) => {
+  const id = request.params.id
+  const { name,number } = request.body
+
+  Person.findOneAndUpdate({ name:name },{ number:number, name:name },{ new:true,runValidators: true, context: 'query' })
+    .then(result => {
+      if (result)
+        response.json(result)
+      else
+        response.status(404).json({ error: 'this person does not exist in the phonebook' })
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
-    const person = Person.find({_id: id})
-        .then(result=>{
-            if(result[0]){
-                response.json(result[0])
-            }   
-            else{
-                response.statusMessage="Person not found"
-                response.status(404).end()
-            }
-        })
-        .catch(error => {
-            next(error)
-        })
+  const id = request.params.id
+  const person = Person.find({ _id: id })
+    .then(result => {
+      if(result[0]){
+        response.json(result[0])
+      }
+      else{
+        response.statusMessage='Person not found'
+        response.status(404).end()
+      }
+    })
+    .catch(error => {
+      next(error)
+    })
 
 })
 
-app.delete('/api/persons/:id', (request, response, next) =>{
-    const id = request.params.id;
-    Person.findByIdAndDelete(id)
-        .then(result => {
-            response.status(204).end()
-        })
-        .catch(error => next(error))
+app.delete('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  Person.findByIdAndDelete(id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 
 })
 
 app.get('/info', (request, response) => {
-    Person.find({}).then(result => {
-        response.send(`
+  Person.find({}).then(result => {
+    response.send(`
     <p>Phonebook has info for ${result.length} people
     <br/>
     ${new Date()} </p>
     `)
-    })
-  
+  })
+
 })
 
 app.post('/api/persons', (request, response,next) => {
-    const body = request.body;
+  const body = request.body
 
-    /* if (!body.name || !body.number){
+  /* if (!body.name || !body.number){
         return response.status(400).json({
             ...body,
             error: "name or number missing"
         })
     }  */
-    Person.exists({name:body.name})
-        .then(person => {
-            if(person){
-                response.status(409).json({
-                    error: "This name is already set in the server"
-                })
-            } else {
-                const newPerson = new Person({
-                    name: body.name,
-                    number: body.number
-                })
-
-                newPerson.save()
-                .then(savedPerson => {
-                    response.json(savedPerson)
-                })
-                .catch(error => next(error))
-                
-            }
+  Person.exists({ name:body.name })
+    .then(person => {
+      if(person){
+        response.status(409).json({
+          error: 'This name is already set in the server'
         })
-        .catch(error => next(error))
-     
+      } else {
+        const newPerson = new Person({
+          name: body.name,
+          number: body.number
+        })
+
+        newPerson.save()
+          .then(savedPerson => {
+            response.json(savedPerson)
+          })
+          .catch(error => next(error))
+
+      }
+    })
+    .catch(error => next(error))
+
 })
 
 const unknownEndpoint = (request, response) => {
@@ -123,19 +123,19 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-  
+
   switch (error.name) {
     case 'CastError':
-        return response.status(400).send({ error: 'malformatted id', type: 'CastError' })
+      return response.status(400).send({ error: 'malformatted id', type: 'CastError' })
     case 'ValidationError':
-        return response.status(400).json({ error: error.message , type: 'ValidationError'})
-        break;
+      return response.status(400).json({ error: error.message , type: 'ValidationError' })
+      break
     default:
-        console.error(error.message)
-        next(error)
-        break;
+      console.error(error.message)
+      next(error)
+      break
   }
-  
+
 }
 
 app.use(errorHandler)
